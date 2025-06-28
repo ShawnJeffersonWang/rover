@@ -1,10 +1,10 @@
 // src/main.rs
 mod config;
 mod error;
-mod handlers;
 mod middleware;
 mod routes;
 mod state;
+mod handlers;
 
 use crate::state::AppState;
 use sqlx::postgres::PgPoolOptions;
