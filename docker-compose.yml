@@ -54,7 +54,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "8080:8080" # 将端口映射到宿主机，方便调试
+      - "8000:8000" # 将端口映射到宿主机，方便调试
     networks:
       - app-network
     environment:
