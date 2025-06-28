@@ -9,7 +9,6 @@ mod handlers;
 use crate::state::AppState;
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
-use std::time::Duration;
 use tokio::signal;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
