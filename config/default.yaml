@@ -1,0 +1,29 @@
+# config/default.yaml
+server:
+  port: 8000
+  mode: "debug" # "debug" 或 "release"
+
+log:
+  level: "info"
+
+postgres:
+  host: "postgres"
+  port: 5432
+  user: "root"
+  password: "325523"
+  dbname: "agricultural_vision"
+  max_connections: 100
+
+redis:
+  url: "redis://127.0.0.1:6379"
+
+kafka:
+  brokers: "localhost:9092"
+  topic: "post_creation_topic"
+
+jwt:
+  secret: "your-super-secret-key"
+
+snowflake:
+  machine_id: 1
+  start_time: "2024-01-01T00:00:00Z"
