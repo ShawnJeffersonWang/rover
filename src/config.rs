@@ -33,12 +33,17 @@ impl PostgresConfig {
 }
 
 // ... 其他配置结构体 (Redis, Kafka, JWT, Snowflake) ...
+#[derive(Debug, Deserialize, Clone)]
+pub struct JwtConfig {
+    pub secret: String,
+}
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
     pub server: ServerConfig,
     pub log: LogConfig,
     pub postgres: PostgresConfig,
+    pub jwt: JwtConfig,
     // ... 其他配置 ...
 }
 

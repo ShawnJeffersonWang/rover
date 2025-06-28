@@ -38,6 +38,7 @@ async fn main() -> anyhow::Result<()> {
     // 4. 创建应用共享状态
     let app_state = AppState {
         db_pool: Arc::new(db_pool),
+        jwt_secret: Arc::new(settings.jwt.secret), // 从配置初始化
         // ...
     };
 

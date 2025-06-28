@@ -1,30 +1,53 @@
 // src/middleware.rs
 use crate::error::AppError;
+use crate::state::AppState;
 use axum::{
+    body::Body,
     extract::State,
-    http::{Request, StatusCode},
+    http::{header, Request},
     middleware::Next,
     response::Response,
 };
-// ... 其他 use ...
+use jsonwebtoken::{decode, DecodingKey, Validation};
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+// 建议导入 tracing
+use tracing;
 
-// 这是一个JWT认证中间件的骨架
-pub async fn jwt_auth<B>(
-    // state: State<AppState>, // 如果需要访问数据库
-    req: Request<B>,
-    next: Next<B>,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Claims {
+    pub sub: String,
+    pub exp: usize,
+}
+
+/// JWT 认证中间件
+pub async fn jwt_auth(
+    State(state): State<AppState>,
+    mut req: Request<Body>,
+    next: Next,
 ) -> Result<Response, AppError> {
-    let auth_header = req
+    let token = req
         .headers()
-        .get(axum::http::header::AUTHORIZATION)
-        .and_then(|header| header.to_str().ok());
+        .get(header::AUTHORIZATION)
+        .and_then(|auth_header| auth_header.to_str().ok())
+        .and_then(|auth_value| auth_value.strip_prefix("Bearer "));
 
-    if let Some(token) = auth_header.and_then(|s| s.strip_prefix("Bearer ")) {
-        // 在这里验证 token...
-        // let claims = decode_token(token, &state.jwt_secret)?;
-        // 可以将用户信息放入请求扩展中，供后续处理器使用
-        // req.extensions_mut().insert(claims);
-        println!("Token validated: {}", token); // 示例
+    if let Some(token_str) = token {
+        // --- 问题在这里 ---
+        // 修改前:
+        // let decoding_key = DecodingKey::from_secret(state.jwt_secret.as_ref());
+
+        // 修改后:
+        let decoding_key = DecodingKey::from_secret(state.jwt_secret.as_bytes()); // 使用 .as_bytes() 而不是 .as_ref()
+
+        let token_data = decode::<Claims>(token_str, &decoding_key, &Validation::default())
+            .map_err(|err| {
+                tracing::warn!("JWT decode error: {}", err);
+                AppError::AuthError
+            })?;
+
+        req.extensions_mut().insert(Arc::new(token_data.claims));
+
         Ok(next.run(req).await)
     } else {
         Err(AppError::AuthError)
