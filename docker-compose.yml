@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U your_user -d agricultural_vision" ] # 使用 pg_isready 进行健康检查
+      test: [ "CMD-SHELL", "pg_isready -U root -d agricultural_vision" ] # 使用 pg_isready 进行健康检查
       interval: 10s
       timeout: 5s
       retries: 5
